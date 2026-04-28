@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>AMOS WEB OS V14 PRO FINAL - UPDATED</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* CSS CORE AMOS OS */
+        body { margin:0; font-family:Consolas, monospace; background: #000; color:#00ff9f; overflow:hidden; }
+        button { cursor:pointer; background:black; color:#00ff9f; border:1px solid #00ff9f; padding:6px 12px; border-radius:4px; transition: 0.3s; }
+        button:hover { background:#00ff9f; color:black; }
+        input, textarea { background:black; color:#00ff9f; border:1px solid #00ff9f; padding:8px; border-radius:4px; margin: 5px 0; width: calc(100% - 22px); }
+
+        /* MATRIX BG EFFECT */
+        #bgCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:0.15; pointer-events:none; }
+        
+        /* LOGIN SCREEN */
+        #login { position:fixed; width:100%; height:100%; display:flex; justify-content:center; align-items:center; flex-direction:column; background:rgba(0,0,0,0.98); z-index:9999; border: 2px solid #00ff9f; }
+        
+        /* DESKTOP AREA */
+        #desktop { display:none; width:100%; height:100vh; flex-direction:row; position: relative; z-index: 1; }
+        #sidebar { width:220px; background:rgba(0,10,20,0.95); border-right:1px solid #00ff9f44; padding:15px; overflow-y:auto; }
+        .side-item { padding:12px; border-bottom:1px solid #003322; cursor:pointer; font-size: 13px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+        .side-item:hover { background:rgba(0,255,159,0.1); padding-left: 20px; }
+
+        /* WINDOW SYSTEM */
+        .window { position:absolute; top:12%; left:25%; width:620px; height:460px; background:rgba(0,5,12,0.98); border:1px solid #00ff9f; display:none; flex-direction:column; z-index:100; box-shadow: 0 0 30px rgba(0,255,159,0.2); border-radius: 10px; overflow: hidden; }
+        .titlebar { background:#001a12; padding:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #00ff9f; cursor:move; font-weight:bold; letter-spacing: 1px; }
+        .window-content { flex:1; padding:20px; overflow-y:auto; scrollbar-width: thin; scrollbar-color: #00ff9f #000; }
+
+        /* MUSIC PLAYER STYLING */
+        .music-ui { background: #000; border: 1px solid #003322; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .progress-container { width: 100%; height: 8px; background: #111; cursor: pointer; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        #progressFill { height: 100%; background: linear-gradient(to right, #008f5d, #00ff9f); width: 0%; transition: 0.1s; }
+        
+        /* FILE MANAGER GRID */
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; margin-top: 20px; }
+        .file-card { text-align: center; padding: 12px; border: 1px solid #00ff9f22; border-radius: 8px; transition: 0.3s; cursor: pointer; position: relative; }
+        .file-card:hover { border-color: #00ff9f; background: rgba(0,255,159,0.08); transform: translateY(-3px); }
+        .file-card i { font-size: 35px; display: block; margin-bottom: 10px; }
+        .file-card span { font-size: 10px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.8; }
+
+        /* TASKBAR */
+        #taskbar { position:fixed; bottom:0; left:0; width:100%; height:45px; background:rgba(0,0,0,0.9); border-top:1px solid #00ff9f; display:flex; align-items:center; padding:0 20px; z-index:1000; justify-content: space-between; box-sizing: border-box; }
+        
+        @media (max-width: 768px) {
+            .window { width: 95%; left: 2.5%; height: 75%; top: 10%; }
+            #sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div id="login">
+    <i class="fa-solid fa-user-secret" style="font-size: 50px; color: #00ff9f; margin-bottom: 20px;"></i>
+    <h2 style="letter-spacing: 8px;">AMOS OS v14</h2>
+    <input type="password" id="pinInput" placeholder="SYSTEM PIN (101312)">
+    <button onclick="checkAuth()" style="width: 160px; margin-top: 15px; font-weight: bold;">LOGIN</button>
+</div>
+
+<div id="desktop">
+    <div id="sidebar">
+        <div style="font-size: 11px; color: #008f5d; margin-bottom: 15px; font-weight: bold;">[ SYSTEM NAVIGATOR ]</div>
+        <div class="side-item" onclick="openApp('winMusic')"><i class="fa-solid fa-music"></i> MUSIC PRO</div>
+        <div class="side-item" onclick="openApp('winFiles')"><i class="fa-solid fa-cloud-arrow-up"></i> FILE MANAGER</div>
+        <div class="side-item" onclick="openApp('winNotes')"><i class="fa-solid fa-terminal"></i> TERMINAL NOTES</div>
+        <div class="side-item" onclick="sysLogout()" style="color: #ff4d4d; margin-top: 60px;"><i class="fa-solid fa-power-off"></i> SHUTDOWN</div>
+    </div>
+
+    <div id="workspace" style="flex:1; position: relative;">
+        <div class="window" id="winMusic">
+            <div class="titlebar"><span><i class="fa-solid fa-compact-disc fa-spin"></i> MUSIC_V2.SYS</span> <span onclick="closeApp('winMusic')" style="cursor:pointer">✕</span></div>
+            <div class="window-content">
+                <div class="music-ui">
+                    <div id="trackName" style="font-size: 14px; margin-bottom: 5px; color: #00ff9f;">Waiting for selection...</div>
+                    <div class="progress-container" onclick="seekAudio(event)">
+                        <div id="progressFill"></div>
+                    </div>
+                    <div style="display:flex; justify-content: center; gap: 25px; align-items: center;">
+                        <i class="fa-solid fa-play" onclick="audioControl('play')" style="cursor:pointer; font-size: 20px;"></i>
+                        <i class="fa-solid fa-pause" onclick="audioControl('pause')" style="cursor:pointer; font-size: 20px;"></i>
+                    </div>
+                </div>
+                <div id="musicListContainer"></div>
+            </div>
+        </div>
+
+        <div class="window" id="winFiles">
+            <div class="titlebar"><span><i class="fa-solid fa-folder-tree"></i> CLOUD_STORAGE.EXE</span> <span onclick="closeApp('winFiles')" style="cursor:pointer">✕</span></div>
+            <div class="window-content">
+                <div style="border: 2px dashed #00ff9f44; padding: 20px; border-radius: 12px; background: rgba(0,255,159,0.02); text-align: center;">
+                    <i class="fa-solid fa-upload" style="margin-bottom: 10px; display: block;"></i>
+                    <input type="file" id="uploadInput" accept="image/*, application/pdf, audio/*" style="font-size: 11px; margin-bottom: 10px;">
+                    <button onclick="uploadToCloud()" id="btnUpload" style="width: 100%;">UPLOAD TO CLOUD</button>
+                </div>
+                <div class="file-grid" id="fileGridDisplay"></div>
+            </div>
+        </div>
+
+        <div class="window" id="winNotes">
+            <div class="titlebar"><span><i class="fa-solid fa-file-code"></i> SYSTEM_LOG.TXT</span> <span onclick="closeApp('winNotes')" style="cursor:pointer">✕</span></div>
+            <div class="window-content">
+                <textarea id="sysNoteArea" style="height: 80%; border-color: #003322;" placeholder="Start typing logs..."></textarea>
+                <button onclick="saveNoteLocal()" style="margin-top: 10px;">SAVE DATA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskbar">
+        <div style="font-weight: bold;"><i class="fa-solid fa-microchip"></i> AMOS_OS_V14</div>
+        <div id="digitalClock" style="font-family: 'Courier New', monospace;">00:00:00</div>
+    </div>
+</div>
+
+<audio id="coreAudioPlayer"></audio>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+    // FIREBASE CONFIGURATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
+        authDomain: "amos-web-os.firebaseapp.com",
+        projectId: "amos-web-os",
+        storageBucket: "amos-web-os.firebasestorage.app",
+        messagingSenderId: "59843745100",
+        appId: "1:59843745100:web:b29e5996052a3bf5672be9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const audioCore = document.getElementById("coreAudioPlayer");
+
+    // AUTHENTICATION SYSTEM
+    function checkAuth() {
+        const pin = document.getElementById("pinInput").value;
+        if(pin === "101312") {
+            document.getElementById("login").style.display = "none";
+            document.getElementById("desktop").style.display = "flex";
+            localStorage.setItem("amos_auth_state", "true");
+            initSystem();
+        } else { alert("ACCESS DENIED: WRONG PIN"); }
+    }
+
+    if(localStorage.getItem("amos_auth_state") === "true") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("desktop").style.display = "flex";
+        window.onload = initSystem;
+    }
+
+    function sysLogout() { localStorage.removeItem("amos_auth_state"); location.reload(); }
+    function openApp(id) { document.getElementById(id).style.display = "flex"; }
+    function closeApp(id) { document.getElementById(id).style.display = "none"; }
+
+    function initSystem() { refreshMusic(); refreshFiles(); }
+
+    // --- MUSIC MODULE ---
+    async function refreshMusic() {
+        const snap = await db.collection("files").where("type", "==", "audio").get();
+        const container = document.getElementById("musicListContainer");
+        container.innerHTML = "";
+        snap.forEach(doc => {
+            const data = doc.data();
+            container.innerHTML += `<div class="side-item" onclick="playTrack('${data.url}', '${data.name}')"><i class="fa-solid fa-play-circle"></i> ${data.name}</div>`;
+        });
+    }
+
+    function playTrack(url, name) {
+        audioCore.src = url;
+        audioCore.play();
+        document.getElementById("trackName").innerText = name;
+    }
+
+    function audioControl(type) {
+        if(type === 'play') audioCore.play();
+        else audioCore.pause();
+    }
+
+    audioCore.ontimeupdate = () => {
+        const progress = (audioCore.currentTime / audioCore.duration) * 100;
+        document.getElementById("progressFill").style.width = progress + "%";
+    };
+
+    function seekAudio(e) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        audioCore.currentTime = ((e.clientX - rect.left) / rect.width) * audioCore.duration;
+    }
+
+    // --- FILE MANAGER & CLOUD UPLOAD ---
+    async function refreshFiles() {
+        const snap = await db.collection("files").orderBy("created", "desc").get();
+        const grid = document.getElementById("fileGridDisplay");
+        grid.innerHTML = "";
+        snap.forEach(doc => {
+            const f = doc.data();
+            let icon = "fa-file-lines";
+            if(f.type === 'image') icon = "fa-file-image";
+            else if(f.type === 'pdf') icon = "fa-file-pdf";
+            else if(f.type === 'audio') icon = "fa-file-audio";
+
+            grid.innerHTML += `
+                <div class="file-card" onclick="window.open('${f.url}', '_blank')">
+                    <i class="fa-solid ${icon}" style="color: ${f.type==='pdf'?'#ff4d4d':f.type==='image'?'#00d1ff':'#00ff9f'}"></i>
+                    <span>${f.name}</span>
+                    <button onclick="event.stopPropagation(); deleteFileData('${doc.id}')" style="font-size:7px; border-color: red; color: red; margin-top:5px;">DELETE</button>
+                </div>`;
+        });
+    }
+
+    async function uploadToCloud() {
+        const file = document.getElementById("uploadInput").files[0];
+        if(!file) return alert("Pilih file terlebih dahulu!");
+        
+        const btn = document.getElementById("btnUpload");
+        btn.innerText = "UPLOADING SYSTEM...";
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "ml_default");
+
+        try {
+            const res = await fetch(`https://api.cloudinary.com/v1_1/dkisbfx29/auto/upload`, { method: "POST", body: formData });
+            const cloud = await res.json();
+            
+            let fType = "other";
+            if(file.type.includes("image")) fType = "image";
+            else if(file.type.includes("pdf")) fType = "pdf";
+            else if(file.type.includes("audio")) fType = "audio";
+
+            await db.collection("files").add({
+                name: file.name,
+                url: cloud.secure_url,
+                type: fType,
+                created: Date.now()
+            });
+            
+            alert("UPLOAD SUCCESSFUL!");
+            btn.innerText = "UPLOAD TO CLOUD";
+            btn.disabled = false;
+            initSystem();
+        } catch(err) {
+            alert("UPLOAD FAILED!");
+            btn.innerText = "UPLOAD TO CLOUD";
+            btn.disabled = false;
+        }
+    }
+
+    async function deleteFileData(id) {
+        if(confirm("Hapus file permanen?")) { 
+            await db.collection("files").doc(id).delete(); 
+            initSystem(); 
+        }
+    }
+
+    // --- NOTES & UTILS ---
+    function saveNoteLocal() {
+        localStorage.setItem("amos_os_note", document.getElementById("sysNoteArea").value);
+        alert("LOG SAVED TO LOCAL.");
+    }
+    document.getElementById("sysNoteArea").value = localStorage.getItem("amos_os_note") || "";
+
+    // Clock Logic
+    setInterval(() => { 
+        document.getElementById("digitalClock").innerText = new Date().toLocaleTimeString(); 
+    }, 1000);
+
+    // Draggable Logic
+    document.querySelectorAll(".titlebar").forEach(bar => {
+        bar.onmousedown = (e) => {
+            let win = bar.parentElement;
+            let offX = e.clientX - win.offsetLeft, offY = e.clientY - win.offsetTop;
+            document.onmousemove = (m) => {
+                win.style.left = (m.clientX - offX) + 'px';
+                win.style.top = (m.clientY - offY) + 'px';
+                win.style.transform = "none";
+            };
+            document.onmouseup = () => { document.onmousemove = null; };
+        };
+    });
+</script>
+</body>
+</html>
