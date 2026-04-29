@@ -2,190 +2,186 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>AMOS OS V14 - ULTIMATE ANONYMOUS</title>
+    <title>AMOS OS V14 - ANONYMOUS PRO FINAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        :root { --matrix-color: #00ff9f; --glow: 0 0 10px rgba(0, 255, 159, 0.5); }
+        :root { --matrix-color: #00ff9f; --premium-glow: 0 0 15px rgba(0, 255, 159, 0.4); }
         
-        /* ================= BASE SYSTEM ================= */
+        /* BASE SYSTEM & ANIMATION */
         body { 
-            margin:0; font-family: 'Consolas', 'Segoe UI', monospace; 
+            margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; 
             background: #000; color: var(--matrix-color); 
             overflow:hidden; touch-action: manipulation; height: 100vh;
         }
 
-        /* MULTI-LAYER ANIMATED BACKGROUND */
-        #bg-system { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; }
+        #bg-system { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; background: #000; }
         .hacker-img { 
             position:absolute; top:0; left:0; width:100%; height:100%; 
             background-size:cover; background-position:center; 
-            opacity:0; transition: opacity 2s ease-in-out; 
+            opacity:0; transition: opacity 1.5s ease-in-out; transform: scale(1.1); 
         }
-        .hacker-img.active { opacity:0.3; }
+        .hacker-img.active { opacity:0.35; transform: scale(1.0); }
+        
         #bgCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; opacity:0.2; pointer-events:none; }
 
-        /* ================= UI ELEMENTS ================= */
+        /* UI MOBILE OPTIMIZATION */
         #header { 
             position: fixed; top: 0; width: 100%; height: 55px; 
-            background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--matrix-color); 
+            background: rgba(0,0,0,0.85); border-bottom: 1px solid var(--matrix-color); 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 15px; z-index: 1000; box-sizing: border-box; 
+            padding: 0 15px; z-index: 1000; box-sizing: border-box; backdrop-filter: blur(10px);
         }
-        
+
         #sidebar { 
-            position: fixed; left: -285px; top: 0; width: 260px; height: 100vh; 
-            background: rgba(0,0,0,0.95); z-index: 2000; 
-            transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            padding: 25px; box-sizing: border-box; 
+            position: fixed; left: -285px; top: 0; width: 270px; height: 100vh; 
+            background: rgba(0,0,0,0.95); z-index: 3000; 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 30px 20px; box-sizing: border-box; 
             border-right: 1px solid var(--matrix-color); 
         }
-        #sidebar.active { left: 0; box-shadow: 10px 0 50px #000; }
+        #sidebar.active { left: 0; box-shadow: 15px 0 50px rgba(0,0,0,0.9); }
 
         .nav-link { 
-            padding: 15px; display: flex; align-items: center; gap: 15px; 
-            border-radius: 10px; cursor: pointer; margin-bottom: 8px; 
+            padding: 16px; display: flex; align-items: center; gap: 15px; 
+            border-radius: 12px; cursor: pointer; margin-bottom: 10px; 
             border: 1px solid transparent; transition: 0.3s;
         }
-        .nav-link:active, .nav-link:hover { 
-            background: rgba(0, 255, 159, 0.1); border-color: var(--matrix-color); 
-        }
+        .nav-link:active { background: rgba(0, 255, 159, 0.15); border-color: var(--matrix-color); }
 
-        /* ================= WINDOWS SYSTEM ================= */
+        /* WINDOW SYSTEM */
         .window { 
-            position:fixed; top:10%; left:3%; width:94%; height:80%; 
-            background: rgba(0, 5, 5, 0.98); border: 1px solid var(--matrix-color); 
-            display:none; flex-direction:column; z-index:100; border-radius: 15px; 
-            overflow: hidden; backdrop-filter: blur(10px); 
-            animation: openWin 0.3s ease-out;
+            position:fixed; top:10%; left:3%; width:94%; height:82%; 
+            background: rgba(0, 8, 5, 0.95); border: 1px solid var(--matrix-color); 
+            display:none; flex-direction:column; z-index:100; border-radius: 18px; 
+            overflow: hidden; backdrop-filter: blur(20px); 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
-        @keyframes openWin { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
         .titlebar { 
-            background: rgba(0, 255, 159, 0.1); padding: 15px; 
+            background: rgba(0, 255, 159, 0.1); padding: 16px; 
             display:flex; justify-content:space-between; align-items:center; 
-            border-bottom: 1px solid var(--matrix-color); font-weight:bold; 
+            border-bottom: 1px solid rgba(0, 255, 159, 0.3); font-weight:bold;
         }
-        .window-content { flex:1; padding:15px; overflow-y:auto; -webkit-overflow-scrolling: touch; }
+        .window-content { flex:1; padding:18px; overflow-y:auto; -webkit-overflow-scrolling: touch; }
 
-        /* ================= MUSIC PLAYER UI ================= */
-        .player-controls { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
-        .control-btn { font-size: 24px; cursor: pointer; transition: 0.2s; opacity: 0.6; }
-        .control-btn.active { opacity: 1; color: #fff; text-shadow: var(--glow); }
+        /* MUSIC PLAYER PRO */
+        .player-controls { display: flex; justify-content: space-around; align-items: center; margin: 25px 0; }
+        .p-btn { font-size: 22px; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+        .p-btn.active { opacity: 1; color: #fff; text-shadow: var(--premium-glow); }
         
-        .progress-container { width: 100%; height: 6px; background: #111; border-radius: 10px; margin: 15px 0; cursor: pointer; }
-        #prog-fill { height: 100%; background: var(--matrix-color); width: 0%; border-radius: 10px; transition: 0.1s; }
+        .progress-box { width: 100%; height: 6px; background: #111; border-radius: 10px; margin: 15px 0; cursor: pointer; overflow: hidden; }
+        #prog-fill { height: 100%; background: var(--matrix-color); width: 0%; box-shadow: var(--premium-glow); }
 
-        .sc-input-box { 
-            background: rgba(255, 101, 0, 0.05); border: 1px dashed #ff5500; 
-            padding: 12px; border-radius: 10px; margin: 15px 0; 
-        }
-        
-        /* ================= BUTTONS & INPUTS ================= */
-        button { 
-            background: #000; color: var(--matrix-color); border: 1px solid var(--matrix-color); 
-            padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer;
-        }
-        input { 
-            background: #000; border: 1px solid #004422; color: var(--matrix-color); 
-            padding: 12px; border-radius: 8px; width: 100%; box-sizing: border-box; outline: none;
-        }
+        #sc-frame { width: 100%; height: 160px; border-radius: 12px; border: none; margin-top: 15px; display: none; }
 
+        /* FLOATING DRAG PLAYER */
+        #floating-player { 
+            position:fixed; bottom:110px; right:20px; width:60px; height:60px; 
+            background:rgba(0,0,0,0.9); border:2px solid var(--matrix-color); 
+            border-radius:50%; display:none; justify-content:center; align-items:center; 
+            z-index:2000; cursor:grab; box-shadow: var(--premium-glow); 
+        }
+        #floating-player i { font-size:25px; animation: rotate 4s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* LOGIN GATE */
         #login-gate { 
-            position:fixed; width:100%; height:100%; display:flex; 
-            justify-content:center; align-items:center; background:#000; z-index:9999; 
+            position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:#000; z-index:9999; display:flex; justify-content:center; align-items:center; 
+        }
+        .login-box { text-align:center; padding:40px; border:1px solid var(--matrix-color); border-radius:25px; width:80%; max-width:320px; }
+
+        input, button { 
+            background:#000; color:var(--matrix-color); border:1px solid var(--matrix-color); 
+            padding:14px; border-radius:10px; width:100%; font-weight:bold; outline:none; margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div id="bg-system">
-    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1000')"></div>
-    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=1000')"></div>
-    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1000')"></div>
-    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1000')"></div>
-    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1510511459019-5dee99c43f20?w=1000')"></div>
+    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800')"></div>
+    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=800')"></div>
+    <div class="hacker-img" style="background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800')"></div>
     <canvas id="bgCanvas"></canvas>
 </div>
 
 <div id="login-gate">
-    <div style="text-align: center; width: 80%; max-width: 300px;">
-        <i class="fa-solid fa-user-secret" style="font-size: 60px; margin-bottom: 20px;"></i>
-        <h2 style="letter-spacing: 5px;">ACCESS CODE</h2>
-        <input type="password" id="sys-pin" placeholder="ENTER PIN" style="text-align:center; font-size: 20px;">
-        <button onclick="unlock()" style="margin-top: 15px;">BOOT SYSTEM</button>
+    <div class="login-box">
+        <i class="fa-solid fa-user-secret" style="font-size: 50px; margin-bottom: 20px;"></i>
+        <h3 style="letter-spacing: 5px;">SECURITY LOCK</h3>
+        <input type="password" id="sys-pin" placeholder="••••••" style="text-align: center; font-size: 20px;">
+        <button onclick="unlock()">INITIALIZE ACCESS</button>
     </div>
 </div>
 
 <div id="header">
     <i class="fa-solid fa-bars-staggered" style="font-size: 20px;" onclick="toggleSidebar()"></i>
-    <span style="font-weight: bold; letter-spacing: 2px;">AMOS_OS V14</span>
-    <div id="clock" style="font-size: 14px;">00:00:00</div>
+    <span style="font-weight: bold; letter-spacing: 3px;">AMOS OS <span style="color:#fff;">V14</span></span>
+    <span id="digital-clock" style="font-family: monospace;">00:00:00</span>
 </div>
 
 <div id="sidebar">
-    <div style="margin-bottom: 40px; border-bottom: 1px solid var(--matrix-color); padding-bottom: 10px;">
-        <h3 style="margin:0;">MAIN MENU</h3>
+    <div style="margin-bottom: 40px; border-bottom: 1px solid rgba(0,255,159,0.2); padding-bottom: 15px;">
+        <h2 style="margin:0; font-size: 18px;">SYSTEM MENU</h2>
     </div>
-    <div class="nav-link" onclick="openWin('musicWin')"><i class="fa-solid fa-music"></i> MEDIA PLAYER</div>
-    <div class="nav-link" onclick="openWin('fileWin')"><i class="fa-solid fa-folder-open"></i> FILE MANAGER</div>
+    <div class="nav-link" onclick="openWin('musicWin')"><i class="fa-solid fa-compact-disc"></i> AUDIO CENTER</div>
     <div class="nav-link" onclick="openWin('scWin')"><i class="fa-brands fa-soundcloud"></i> SOUNDCLOUD</div>
-    <div class="nav-link" onclick="location.reload()" style="color: #ff4d4d; margin-top: 50px;"><i class="fa-solid fa-power-off"></i> SHUTDOWN</div>
+    <div class="nav-link" onclick="openWin('fileWin')"><i class="fa-solid fa-folder-open"></i> FILE MANAGER</div>
+    <div class="nav-link" onclick="location.reload()" style="color:#ff4d4d; margin-top: 50px;"><i class="fa-solid fa-power-off"></i> TERMINATE</div>
 </div>
 
 <div id="workspace">
-    
     <div class="window" id="musicWin">
-        <div class="titlebar"><span><i class="fa-solid fa-play"></i> NOW PLAYING</span> <span onclick="closeWin('musicWin')">✕</span></div>
+        <div class="titlebar"><span><i class="fa-solid fa-music"></i> MEDIA PLAYER</span> <span onclick="closeWin('musicWin')">✕</span></div>
         <div class="window-content">
-            <h3 id="track-name" style="text-align: center; color: #fff; margin-bottom: 10px;">No Track Selected</h3>
+            <h3 id="track-name" style="text-align: center; color: #fff; margin-bottom: 20px;">No Active Track</h3>
             
-            <div class="progress-container" onclick="seek(event)">
-                <div id="prog-fill"></div>
-            </div>
-            
-            <div style="display:flex; justify-content: space-between; font-size: 11px;">
+            <div class="progress-box" onclick="seek(event)"><div id="prog-fill"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px;">
                 <span id="cur-t">0:00</span><span id="dur-t">0:00</span>
             </div>
 
             <div class="player-controls">
-                <i class="fa-solid fa-shuffle control-btn" id="btn-shuffle" onclick="toggleShuffle()"></i>
-                <i class="fa-solid fa-backward-step control-btn" onclick="changeTrack(-1)" style="opacity:1"></i>
-                <i class="fa-solid fa-circle-play" id="play-btn" onclick="togglePlay()" style="font-size: 55px; cursor:pointer;"></i>
-                <i class="fa-solid fa-forward-step control-btn" onclick="changeTrack(1)" style="opacity:1"></i>
-                <i class="fa-solid fa-repeat control-btn" id="btn-repeat" onclick="toggleRepeat()"></i>
+                <i class="fa-solid fa-shuffle p-btn" id="shuf-btn" onclick="toggleShuffle()" title="Shuffle"></i>
+                <i class="fa-solid fa-backward-step p-btn" style="opacity:1" onclick="changeTrack(-1)"></i>
+                <i class="fa-solid fa-circle-play" id="play-btn" onclick="togglePlay()" style="font-size: 60px; color: var(--matrix-color);"></i>
+                <i class="fa-solid fa-forward-step p-btn" style="opacity:1" onclick="changeTrack(1)"></i>
+                <i class="fa-solid fa-repeat p-btn" id="rep-btn" onclick="toggleRepeat()" title="Repeat"></i>
             </div>
 
-            <div style="display:flex; gap: 10px; margin-top: 20px;">
-                <input type="file" id="mFile" style="display:none" onchange="uploadTrack()">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="file" id="mFile" style="display:none" onchange="uploadFile('audio')">
                 <button onclick="document.getElementById('mFile').click()">UPLOAD MP3</button>
-                <button onclick="addByLink()">ADD LINK</button>
+                <button onclick="addByLink()">ADD URL</button>
             </div>
-            
             <div id="music-list" style="margin-top: 20px;"></div>
-        </div>
-    </div>
-
-    <div class="window" id="fileWin">
-        <div class="titlebar"><span><i class="fa-solid fa-database"></i> CLOUD FILES</span> <span onclick="closeWin('fileWin')">✕</span></div>
-        <div class="window-content">
-            <button onclick="loadData()" style="margin-bottom: 15px;">SYNC REPOSITORY</button>
-            <div id="file-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
         </div>
     </div>
 
     <div class="window" id="scWin">
         <div class="titlebar"><span>SOUNDCLOUD ONLINE</span> <span onclick="closeWin('scWin')">✕</span></div>
         <div class="window-content">
-            <div class="sc-input-box">
-                <p style="margin: 0 0 10px 0; color: #ff5500; font-size: 12px;">SOUNDCLOUD STREAMING</p>
-                <input type="text" id="sc-id" placeholder="Paste Track ID Here..." style="border-color: #ff5500;">
-                <button onclick="loadSC()" style="margin-top: 10px; background: #ff5500; border: none; color: #fff;">PLAY STREAM</button>
+            <div style="background: rgba(255, 85, 0, 0.1); border: 1px solid #ff5500; padding: 15px; border-radius: 15px; text-align: center;">
+                <i class="fa-brands fa-soundcloud" style="font-size: 40px; color: #ff5500; margin-bottom: 10px;"></i>
+                <input type="text" id="sc-id" placeholder="Paste Track ID..." style="border-color: #ff5500;">
+                <button onclick="loadSC()" style="background: #ff5500; color: white; border: none; margin-top: 10px;">STREAM NOW</button>
             </div>
-            <p style="font-size: 11px; color: #888;">*Pastikan ID Track publik. Anda bisa mendapatkannya dari share link SoundCloud.</p>
+            <iframe id="sc-frame" scrolling="no" frameborder="no" allow="autoplay"></iframe>
         </div>
     </div>
 
+    <div class="window" id="fileWin">
+        <div class="titlebar"><span>FILE EXPLORER</span> <span onclick="closeWin('fileWin')">✕</span></div>
+        <div class="window-content">
+            <button onclick="fetchData()">RELOAD CLOUD</button>
+            <div id="file-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="floating-player" onclick="togglePlay()">
+    <i class="fa-solid fa-compact-disc"></i>
 </div>
 
 <audio id="audioEngine"></audio>
@@ -194,134 +190,100 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-    // ================= GLOBAL LOGIC =================
+    // --- AMOS OS CORE LOGIC ---
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
     function openWin(id) { 
         document.getElementById(id).style.display = "flex"; 
-        document.getElementById('sidebar').classList.remove('active');
+        if(window.innerWidth < 768) document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('floating-player').style.display = "none";
     }
-    function closeWin(id) { document.getElementById(id).style.display = "none"; }
-
-    function unlock() {
-        if(document.getElementById('sys-pin').value === "101312") {
-            document.getElementById('login-gate').style.display = "none";
-            loadData();
-        } else { alert("WRONG PIN"); }
+    function closeWin(id) { 
+        document.getElementById(id).style.display = "none"; 
+        if(!audio.paused) document.getElementById('floating-player').style.display = "flex";
     }
+    function unlock() { if(document.getElementById('sys-pin').value === "101312") { document.getElementById('login-gate').style.display = "none"; fetchData(); } else { alert("ACCESS DENIED"); } }
 
-    // ================= MATRIX ENGINE =================
+    // --- MATRIX ANIMATION ---
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     let w, h, cols, drops = [];
-
-    function initMatrix() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-        cols = Math.floor(w / 15);
-        drops = Array(cols).fill(1);
-    }
-
-    function drawMatrix() {
+    function initM() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; cols = Math.floor(w/15); drops = Array(cols).fill(1); }
+    function drawM() {
         ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,w,h);
         ctx.fillStyle = "#00ff9f"; ctx.font = "15px monospace";
         drops.forEach((y, i) => {
-            const text = Math.floor(Math.random() * 2);
-            ctx.fillText(text, i * 15, y * 15);
-            if(y * 15 > h && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+            const text = Math.floor(Math.random()*2);
+            ctx.fillText(text, i*15, y*15);
+            if(y*15 > h && Math.random() > 0.975) drops[i] = 0; drops[i]++;
         });
     }
-    window.addEventListener('resize', initMatrix);
-    initMatrix(); setInterval(drawMatrix, 50);
+    window.onresize = initM; initM(); setInterval(drawM, 50);
 
-    // ================= BG ROTATION =================
+    // --- BACKGROUND ROTATION ---
     let bgs = document.querySelectorAll('.hacker-img'), bIdx = 0;
-    function rotateBg() {
-        bgs.forEach(b => b.classList.remove('active'));
-        bgs[bIdx].classList.add('active');
-        bIdx = (bIdx + 1) % bgs.length;
-    }
-    setInterval(rotateBg, 5000); rotateBg();
+    function rotBg() { bgs.forEach(b => b.classList.remove('active')); bgs[bIdx].classList.add('active'); bIdx = (bIdx+1)%bgs.length; }
+    setInterval(rotBg, 5000); rotBg();
+    setInterval(() => { document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // ================= CLOCK =================
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }, 1000);
-
-    // ================= FIREBASE & MEDIA =================
-    const firebaseConfig = {
-        apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
-        authDomain: "amos-web-os.firebaseapp.com",
-        projectId: "amos-web-os",
-        storageBucket: "amos-web-os.firebasestorage.app",
-        messagingSenderId: "59843745100",
-        appId: "1:59843745100:web:b29e5996052a3bf5672be9"
-    };
+    // --- FIREBASE & MEDIA LOGIC ---
+    const firebaseConfig = { apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0", authDomain: "amos-web-os.firebaseapp.com", projectId: "amos-web-os", storageBucket: "amos-web-os.firebasestorage.app", messagingSenderId: "59843745100", appId: "1:59843745100:web:b29e5996052a3bf5672be9" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const audio = document.getElementById("audioEngine");
 
-    let songs = [], curIdx = 0, isShuffle = false, isRepeat = false;
+    let songs = [], curIdx = 0, isShuf = false, isRep = false;
 
-    function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('btn-shuffle').classList.toggle('active'); }
-    function toggleRepeat() { isRepeat = !isRepeat; document.getElementById('btn-repeat').classList.toggle('active'); }
+    function toggleShuffle() { isShuf = !isShuf; document.getElementById('shuf-btn').classList.toggle('active'); }
+    function toggleRepeat() { isRep = !isRep; document.getElementById('rep-btn').classList.toggle('active'); }
 
     function loadSC() {
-        const id = document.getElementById('sc-id').value;
-        if(!id) return;
-        audio.src = `https://api.soundcloud.com/tracks/${id}/stream?client_id=OT69O6S0rC09oU7R2m3yQp89n83O14Jp`;
-        document.getElementById('track-name').innerText = "SC Stream: " + id;
-        audio.play();
+        const id = document.getElementById('sc-id').value; if(!id) return;
+        const frame = document.getElementById('sc-frame');
+        frame.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&color=%23ff5500&auto_play=true`;
+        frame.style.display = "block"; audio.pause();
     }
 
-    function loadData() {
+    function fetchData() {
         db.collection("files").orderBy("created", "desc").onSnapshot(snap => {
             songs = [];
-            const list = document.getElementById("music-list");
-            const grid = document.getElementById("file-grid");
-            list.innerHTML = ""; grid.innerHTML = "";
+            const mList = document.getElementById("music-list");
+            const fGrid = document.getElementById("file-grid");
+            mList.innerHTML = ""; fGrid.innerHTML = "";
             snap.forEach(doc => {
                 const d = doc.data();
                 if(d.type === 'audio') {
                     songs.push({id: doc.id, ...d});
-                    list.innerHTML += `<div class="nav-link" onclick="playSong('${doc.id}')" style="background:rgba(255,255,255,0.05); justify-content:space-between;">
-                        <span><i class="fa-solid fa-play"></i> ${d.name}</span>
-                        <i class="fa-solid fa-trash" style="color:red" onclick="event.stopPropagation(); deleteF('${doc.id}')"></i>
-                    </div>`;
+                    mList.innerHTML += `<div class="nav-link" onclick="playS('${doc.id}')" style="background:rgba(255,255,255,0.05); justify-content:space-between"><span>${d.name}</span> <i class="fa-solid fa-trash" style="color:red" onclick="event.stopPropagation(); deleteF('${doc.id}')"></i></div>`;
                 }
-                grid.innerHTML += `<div style="background:#111; padding:15px; border-radius:10px; border:1px solid #222; text-align:center;">
-                    <i class="fa-solid fa-file-code" style="font-size:30px; display:block; margin-bottom:5px;"></i>
-                    <small>${d.name.substring(0,10)}</small>
-                </div>`;
+                fGrid.innerHTML += `<div style="background:#111; padding:15px; border-radius:12px; text-align:center;"><i class="fa-solid fa-file-code" style="font-size:25px;"></i><br><small>${d.name.substring(0,8)}</small></div>`;
             });
         });
     }
 
-    function playSong(id) { curIdx = songs.findIndex(s => s.id === id); start(); }
+    function playS(id) { curIdx = songs.findIndex(s => s.id === id); start(); }
     function start() {
-        const s = songs[curIdx];
-        audio.src = s.url; audio.play();
+        const s = songs[curIdx]; audio.src = s.url; audio.play();
         document.getElementById("track-name").innerText = s.name;
         document.getElementById("play-btn").className = "fa-solid fa-circle-pause";
+        document.getElementById('sc-frame').style.display = "none";
     }
 
     function togglePlay() {
-        if(audio.paused) { if(audio.src) audio.play(); document.getElementById("play-btn").className = "fa-solid fa-circle-pause"; }
+        if(audio.paused) { audio.play(); document.getElementById("play-btn").className = "fa-solid fa-circle-pause"; }
         else { audio.pause(); document.getElementById("play-btn").className = "fa-solid fa-circle-play"; }
     }
 
     function changeTrack(dir) {
         if(songs.length === 0) return;
-        if(isRepeat && dir === 1) { /* tetap di index sama */ }
-        else if(isShuffle && dir === 1) { curIdx = Math.floor(Math.random() * songs.length); }
+        if(isRep && dir === 1) {} 
+        else if(isShuf && dir === 1) { curIdx = Math.floor(Math.random()*songs.length); }
         else { curIdx = (curIdx + dir + songs.length) % songs.length; }
         start();
     }
 
-    audio.onended = () => { if(isRepeat) start(); else changeTrack(1); };
+    audio.onended = () => { if(isRep) start(); else changeTrack(1); };
     audio.ontimeupdate = () => {
-        const p = (audio.currentTime / audio.duration) * 100;
-        document.getElementById("prog-fill").style.width = p + "%";
+        document.getElementById("prog-fill").style.width = (audio.currentTime/audio.duration)*100 + "%";
         document.getElementById("cur-t").innerText = fmt(audio.currentTime);
         document.getElementById("dur-t").innerText = fmt(audio.duration);
     };
@@ -329,27 +291,30 @@
     function seek(e) { audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration; }
     function fmt(s) { if(isNaN(s)) return "0:00"; let m=Math.floor(s/60), r=Math.floor(s%60); return m+":"+(r<10?"0"+r:r); }
 
-    async function uploadTrack() {
-        const file = document.getElementById("mFile").files[0];
-        if(!file) return;
-        const form = new FormData();
-        form.append("file", file); form.append("upload_preset", "ml_default");
+    async function uploadFile(type) {
+        const file = document.getElementById("mFile").files[0]; if(!file) return;
+        const form = new FormData(); form.append("file", file); form.append("upload_preset", "ml_default");
         try {
             const res = await fetch(`https://api.cloudinary.com/v1_1/dkisbfx29/auto/upload`, { method: "POST", body: form });
             const d = await res.json();
-            await db.collection("files").add({ name: file.name, url: d.secure_url, type: "audio", created: Date.now() });
-            alert("UPLOAD SUCCESS");
-        } catch(e) { alert("UPLOAD FAILED"); }
+            await db.collection("files").add({ name: file.name, url: d.secure_url, type: type, created: Date.now() });
+        } catch(e) { alert("Upload Gagal"); }
     }
 
     async function addByLink() {
-        const url = prompt("Direct MP3 URL:");
-        const name = prompt("Track Name:");
+        const url = prompt("MP3 URL:"); const name = prompt("Name:");
         if(url && name) await db.collection("files").add({ name: name, url: url, type: "audio", created: Date.now() });
     }
 
-    async function deleteF(id) { if(confirm("DELETE FILE?")) await db.collection("files").doc(id).delete(); }
+    async function deleteF(id) { if(confirm("Hapus File?")) await db.collection("files").doc(id).delete(); }
 
+    // --- FLOATING DRAG LOGIC (DARI FILE ASLI) ---
+    const fl = document.getElementById('floating-player');
+    let isDrag = false, xO = 0, yO = 0;
+    fl.onmousedown = (e) => { isDrag = true; xO = e.clientX - fl.offsetLeft; yO = e.clientY - fl.offsetTop; };
+    document.onmousemove = (e) => { if(isDrag) { fl.style.left = (e.clientX - xO) + "px"; fl.style.top = (e.clientY - yO) + "px"; fl.style.right = "auto"; fl.style.bottom = "auto"; } };
+    document.onmouseup = () => isDrag = false;
+    fl.ontouchmove = (e) => { let t = e.touches[0]; fl.style.left = (t.clientX - 30) + "px"; fl.style.top = (t.clientY - 30) + "px"; fl.style.right = "auto"; fl.style.bottom = "auto"; };
 </script>
 </body>
 </html>
