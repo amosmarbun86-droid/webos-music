@@ -41,27 +41,27 @@
             backdrop-filter: blur(10px);
         }
 
-        /* UPDATED SIDEBAR WITH IMAGE BACKGROUND */
+        /* UPDATE: BAGIAN MENU BAR DENGAN BACKGROUND GAMBAR */
         #sidebar { 
             position: fixed; left: -290px; top: 0; width: 280px; height: 100vh; 
             z-index: 3000; 
             transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); 
             padding: 30px; box-sizing: border-box; 
             border-right: 1px solid var(--matrix-color);
-            /* Background Image Setup */
-            background-image: url('https://r.jina.ai/i/05e26372076e4c73b063810f27918485'); 
+            /* Menggunakan file yang dilampirkan */
+            background-image: url('1000041725.png'); 
             background-size: cover;
             background-position: center;
             position: relative;
         }
         
-        /* Overlay transparan agar tulisan di Sidebar Jelas */
-        #sidebar::before {
+        /* Lapisan Transparan agar tulisan jelas */
+        #sidebar::after {
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75); /* Kegelapan background menu */
-            backdrop-filter: blur(4px); /* Efek blur halus */
+            background: rgba(0, 0, 0, 0.7); /* Transparansi gelap */
+            backdrop-filter: blur(3px); /* Efek blur agar teks fokus */
             z-index: -1;
         }
 
@@ -76,8 +76,10 @@
         .nav-link { 
             padding: 16px; display: flex; align-items: center; gap: 15px; 
             border-radius: 12px; cursor: pointer; margin-bottom: 12px; 
-            transition: 0.3s; border: 1px solid rgba(0, 255, 159, 0.1);
-            background: rgba(0, 20, 10, 0.4); /* Kotak menu transparan */
+            transition: 0.3s; border: 1px solid rgba(0, 255, 159, 0.2);
+            background: rgba(0, 20, 10, 0.5); /* Kotak menu lebih kontras */
+            position: relative;
+            z-index: 1;
         }
         .nav-link:active { background: rgba(0, 255, 159, 0.3); border-color: var(--matrix-color); }
 
@@ -157,7 +159,7 @@
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div id="sidebar">
-    <div style="border-bottom: 1px solid var(--matrix-color); padding-bottom: 20px; margin-bottom: 30px; position:relative;">
+    <div style="border-bottom: 1px solid var(--matrix-color); padding-bottom: 20px; margin-bottom: 30px; position:relative; z-index: 1;">
         <h3 style="margin:0; color:#fff;">CORE_TERMINAL</h3>
         <small style="color:var(--matrix-color)">Admin: Amos Rosario</small>
     </div>
@@ -207,7 +209,7 @@
                 <button onclick="syncData()" style="flex:1"><i class="fa-solid fa-sync"></i> REFRESH</button>
             </div>
             <div class="file-grid" id="main-file-grid">
-                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -222,9 +224,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-    /* =========================================
-       SYSTEM CORE JAVASCRIPT
-       ========================================= */
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('sidebar-overlay').classList.toggle('active');
@@ -248,7 +247,6 @@
         } else { alert("ACCESS DENIED!"); }
     }
 
-    // Matrix & Clock Engine
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     let w, h, cols, drops = [];
@@ -264,16 +262,12 @@
     window.onresize = initM; initM(); setInterval(runM, 55);
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-    // BG Rotation
     let bgImgs = document.querySelectorAll('.hacker-img'), bgIdx = 0;
     setInterval(() => { 
         bgImgs.forEach(img => img.classList.remove('active'));
         bgImgs[bgIdx].classList.add('active'); bgIdx = (bgIdx+1)%bgImgs.length;
     }, 6000);
 
-    /* =========================================
-       FIREBASE & MEDIA ENGINE
-       ========================================= */
     const config = { apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0", authDomain: "amos-web-os.firebaseapp.com", projectId: "amos-web-os", storageBucket: "amos-web-os.firebasestorage.app", messagingSenderId: "59843745100", appId: "1:59843745100:web:b29e5996052a3bf5672be9" };
     firebase.initializeApp(config);
     const db = firebase.firestore();
@@ -372,7 +366,6 @@
     audio.ontimeupdate = () => { document.getElementById("prog-fill").style.width = (audio.currentTime/audio.duration)*100 + "%"; };
     function handleSeek(e) { audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration; }
 
-    // DRAG LOGIC
     const float = document.getElementById('floating-player');
     let isDrag = false, xOff = 0, yOff = 0;
     float.onmousedown = (e) => { isDrag = true; xOff = e.clientX - float.offsetLeft; yOff = e.clientY - float.offsetTop; };
