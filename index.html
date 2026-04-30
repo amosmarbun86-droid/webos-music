@@ -32,7 +32,7 @@
         .hacker-img.active { opacity:0.35; transform: scale(1.0); }
         #bgCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; opacity:0.25; pointer-events:none; }
 
-        /* UI HEADER & SIDEBAR */
+        /* UI HEADER */
         #header { 
             position: fixed; top: 0; width: 100%; height: 60px; 
             background: rgba(0,0,0,0.95); border-bottom: 1px solid var(--matrix-color); 
@@ -41,12 +41,30 @@
             backdrop-filter: blur(10px);
         }
 
+        /* UPDATED SIDEBAR WITH IMAGE BACKGROUND */
         #sidebar { 
             position: fixed; left: -290px; top: 0; width: 280px; height: 100vh; 
-            background: rgba(0,0,0,0.98); z-index: 3000; 
+            z-index: 3000; 
             transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            padding: 30px; box-sizing: border-box; border-right: 1px solid var(--matrix-color);
+            padding: 30px; box-sizing: border-box; 
+            border-right: 1px solid var(--matrix-color);
+            /* Background Image Setup */
+            background-image: url('https://r.jina.ai/i/05e26372076e4c73b063810f27918485'); 
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
+        
+        /* Overlay transparan agar tulisan di Sidebar Jelas */
+        #sidebar::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75); /* Kegelapan background menu */
+            backdrop-filter: blur(4px); /* Efek blur halus */
+            z-index: -1;
+        }
+
         #sidebar.active { transform: translateX(290px); box-shadow: 15px 0 50px #000; }
         
         #sidebar-overlay {
@@ -58,9 +76,10 @@
         .nav-link { 
             padding: 16px; display: flex; align-items: center; gap: 15px; 
             border-radius: 12px; cursor: pointer; margin-bottom: 12px; 
-            transition: 0.3s; border: 1px solid transparent;
+            transition: 0.3s; border: 1px solid rgba(0, 255, 159, 0.1);
+            background: rgba(0, 20, 10, 0.4); /* Kotak menu transparan */
         }
-        .nav-link:active { background: rgba(0, 255, 159, 0.15); border-color: var(--matrix-color); }
+        .nav-link:active { background: rgba(0, 255, 159, 0.3); border-color: var(--matrix-color); }
 
         /* WINDOW ARCHITECTURE */
         .window { 
@@ -94,7 +113,7 @@
         .c-btn { font-size: 24px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
         .c-btn.active { opacity: 1; color: #fff; text-shadow: var(--glow-shadow); }
 
-        /* FLOATING COMPONENT (DRAGABLE) */
+        /* FLOATING COMPONENT */
         #floating-player { 
             position:fixed; bottom:110px; right:25px; width:68px; height:68px; 
             background:rgba(0,0,0,0.9); border:2px solid var(--matrix-color); 
@@ -138,9 +157,9 @@
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div id="sidebar">
-    <div style="border-bottom: 1px solid var(--matrix-color); padding-bottom: 20px; margin-bottom: 30px;">
+    <div style="border-bottom: 1px solid var(--matrix-color); padding-bottom: 20px; margin-bottom: 30px; position:relative;">
         <h3 style="margin:0; color:#fff;">CORE_TERMINAL</h3>
-        <small>Admin: Amos Rosario</small>
+        <small style="color:var(--matrix-color)">Admin: Amos Rosario</small>
     </div>
     <div class="nav-link" onclick="openWindow('musicWin')"><i class="fa-solid fa-compact-disc"></i> MUSIC_ENGINE</div>
     <div class="nav-link" onclick="openWindow('scWin')"><i class="fa-brands fa-soundcloud"></i> CLOUD_STREAM</div>
@@ -276,7 +295,6 @@
                 const data = doc.data();
                 const id = doc.id;
                 
-                // Audio Category
                 if(data.type === 'audio') {
                     playlist.push({id, ...data});
                     mList.innerHTML += `
@@ -286,7 +304,6 @@
                         </div>`;
                 }
 
-                // Canggih File Manager Display
                 let icon = "fa-file-code", color = "var(--matrix-color)";
                 if(data.type === 'image') { icon = "fa-file-image"; color = "#00d4ff"; }
                 else if(data.type === 'audio') { icon = "fa-file-audio"; color = "#ffcc00"; }
@@ -332,9 +349,6 @@
         frame.style.display = "block"; audio.pause();
     }
 
-    /* =========================================
-       UPLOAD & DELETE & DRAG SYSTEM
-       ========================================= */
     async function deleteFile(id) {
         if(confirm("Hapus file ini secara permanen dari Cloud?")) {
             await db.collection("files").doc(id).delete();
@@ -358,10 +372,9 @@
     audio.ontimeupdate = () => { document.getElementById("prog-fill").style.width = (audio.currentTime/audio.duration)*100 + "%"; };
     function handleSeek(e) { audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration; }
 
-    // FLOATING PLAYER DRAG SYSTEM (PC & MOBILE)
+    // DRAG LOGIC
     const float = document.getElementById('floating-player');
     let isDrag = false, xOff = 0, yOff = 0;
-
     float.onmousedown = (e) => { isDrag = true; xOff = e.clientX - float.offsetLeft; yOff = e.clientY - float.offsetTop; };
     document.onmousemove = (e) => { 
         if(isDrag) { 
@@ -371,7 +384,6 @@
         } 
     };
     document.onmouseup = () => isDrag = false;
-
     float.ontouchmove = (e) => {
         let t = e.touches[0];
         float.style.left = (t.clientX - 34) + "px"; 
