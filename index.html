@@ -360,17 +360,64 @@
     audio.ontimeupdate = () => { if(audio.duration) document.getElementById("prog-fill").style.width = (audio.currentTime/audio.duration)*100 + "%"; };
     function handleSeek(e) { audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration; }
 
-    const float = document.getElementById('floating-player');
-    let isDrag = false, xOff = 0, yOff = 0;
-    float.onmousedown = (e) => { isDrag = true; xOff = e.clientX - float.offsetLeft; yOff = e.clientY - float.offsetTop; };
-    document.onmousemove = (e) => { 
-        if(isDrag) { 
-            float.style.left = (e.clientX - xOff) + "px"; 
-            float.style.top = (e.clientY - yOff) + "px"; 
-            float.style.right = "auto"; float.style.bottom = "auto"; 
-        } 
-    };
-    document.onmouseup = () => isDrag = false;
+    // ===== FLOATING DRAG FIX =====
+const float = document.getElementById('floating-player');
+
+let isDrag = false;
+let offsetX = 0;
+let offsetY = 0;
+
+// MOUSE (PC)
+float.addEventListener("mousedown", (e)=>{
+    isDrag = true;
+    offsetX = e.clientX - float.offsetLeft;
+    offsetY = e.clientY - float.offsetTop;
+});
+
+document.addEventListener("mousemove", (e)=>{
+    if(!isDrag) return;
+
+    float.style.left = (e.clientX - offsetX) + "px";
+    float.style.top  = (e.clientY - offsetY) + "px";
+});
+
+document.addEventListener("mouseup", ()=>{
+    isDrag = false;
+    snapFloat();
+});
+
+// TOUCH (HP)
+float.addEventListener("touchstart", (e)=>{
+    isDrag = true;
+    const touch = e.touches[0];
+    offsetX = touch.clientX - float.offsetLeft;
+    offsetY = touch.clientY - float.offsetTop;
+});
+
+document.addEventListener("touchmove", (e)=>{
+    if(!isDrag) return;
+
+    const touch = e.touches[0];
+    float.style.left = (touch.clientX - offsetX) + "px";
+    float.style.top  = (touch.clientY - offsetY) + "px";
+});
+
+document.addEventListener("touchend", ()=>{
+    isDrag = false;
+    snapFloat();
+});
+
+// SNAP KE SAMPING (BIAR KAYAK CHAT HEAD)
+function snapFloat(){
+    const screenW = window.innerWidth;
+    const btnW = float.offsetWidth;
+
+    if(float.offsetLeft > screenW / 2){
+        float.style.left = (screenW - btnW - 10) + "px";
+    } else {
+        float.style.left = "10px";
+    }
+}
 </script>
 </body>
 </html>
